@@ -1,0 +1,52 @@
+Code Breakdown
+
+1. Speech Recognition Initialization
+  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-GB';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+  Checks if the browser supports speech recognition.
+Initializes the recognition object and sets language preferences.
+
+2. Speech Synthesis Function
+    function speak(text) {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-GB';
+    synth.speak(utterance);
+}
+  Converts text responses into speech
+3. Handling User Commands
+    function handleCommand(command) {
+    const lowerCommand = command.toLowerCase();
+    if (lowerCommand.includes("weather in")) {
+        const city = lowerCommand.replace("weather in", "").trim();
+        fetch(`https://goweather.herokuapp.com/weather/${city}`)
+            .then(response => response.json())
+            .then(data => {
+                speak(`The weather in ${city} is ${data.temperature} with ${data.description}.`);
+            });
+    }
+    Processes user speech input and determines the corresponding action.
+      Calls external weather API to fetch real-time data.
+4. Listening for Voice Commands
+      document.getElementById('start-btn').addEventListener('click', () => {
+    recognition.start();
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        handleCommand(transcript);
+    };
+});
+      Listens for user speech input when the Ask Me button is clicked.
+    Passes the command for processing.
+
+
+Future Improvements
+
+Add support for more languages.
+Implement AI-based natural language processing for better accuracy.
+Enable voice-activated mode without requiring button clicks.
+Expand functionality to control smart home devices.
